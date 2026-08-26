@@ -89,10 +89,10 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
       }}>
         <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>💬</div>
         <h3 style={{ fontSize: '1.3rem', fontWeight: 800, fontFamily: 'var(--font-guj)', color: 'var(--text-primary)' }}>
-          કોઈ સંદેશ નથી
+          કોઈ સંપર્ક કે ચેટ નથી
         </h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 8, fontFamily: 'var(--font-guj)', maxWidth: 380, margin: '8px auto 0 auto', lineHeight: 1.65 }}>
-          કોઈ વસ્તુ પર "સંદેશ મોકલો" ક્લિક કરો. Chat અહીં દેખાશે.
+          કોઈ પણ વસ્તુ પર "વેચનારનો સંપર્ક કરો" પર ક્લિક કરો. સંપર્ક અહીં દેખાશે.
         </p>
       </div>
     );
@@ -109,7 +109,7 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
       {/* Left Sidebar */}
       <div className="chat-sidebar">
         <div className="chat-sidebar-header">
-          💬 સંદેશા ({chats.length})
+          💬 વેચનાર સાથે સંપર્ક ({chats.length})
         </div>
 
         <div className="chat-thread-list">

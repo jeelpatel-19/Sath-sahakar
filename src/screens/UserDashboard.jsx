@@ -56,10 +56,7 @@ export default function UserDashboard({
   }, [currentUser?.id, dashboardTab]);
 
   const myProducts = products.filter(p =>
-    p.sellerId === currentUser?.id ||
-    p.sellerName === currentUser?.name ||
-    p.contactNumber === currentUser?.phone ||
-    p.sellerName === 'રાજ પટેલ'
+    p.sellerId === currentUser?.id || p.seller_id === currentUser?.id
   );
 
   const soldProducts = myProducts.filter(p => p.status === 'sold');

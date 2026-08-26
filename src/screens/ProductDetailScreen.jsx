@@ -216,7 +216,7 @@ export default function ProductDetailScreen({
           {/* CTA Buttons */}
           {!isSold ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* Buy Now Primary CTA */}
+              {/* Buy Now / Want Item Primary CTA */}
               <button
                 id="btn-buy-now"
                 onClick={() => setShowCheckoutModal(true)}
@@ -226,10 +226,10 @@ export default function ProductDetailScreen({
                   boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)'
                 }}
               >
-                <ShoppingBag size={19} /> હમણાં ખરીદો (Buy Now)
+                <ShoppingBag size={19} /> આ વસ્તુ જોઈએ છે
               </button>
 
-              {/* Message Seller */}
+              {/* Chat Seller */}
               <button
                 id="btn-message-seller"
                 onClick={() => onStartChat(product)}
@@ -242,10 +242,10 @@ export default function ProductDetailScreen({
                   fontFamily: 'var(--font-guj)', transition: 'var(--transition)'
                 }}
               >
-                <MessageSquare size={18} /> સંદેશ મોકલો
+                <MessageSquare size={18} /> વેચનાર સાથે ચેટ કરો
               </button>
 
-              {/* Call */}
+              {/* Call Seller */}
               <button
                 id="btn-call-seller"
                 onClick={() => setShowContactModal(true)}
@@ -258,7 +258,7 @@ export default function ProductDetailScreen({
                   fontFamily: 'var(--font-guj)', transition: 'var(--transition)'
                 }}
               >
-                <PhoneCall size={18} /> કૉલ કરો
+                <PhoneCall size={18} /> વેચનારને કૉલ કરો
               </button>
 
               {/* Save & Share */}
@@ -314,7 +314,7 @@ export default function ProductDetailScreen({
           <div className="modal-content">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'var(--font-guj)' }}>
-                📞 વેચનારનો સંપર્ક
+                📞 વેચનારને કૉલ કરો
               </h3>
               <button
                 id="btn-close-call-modal"
@@ -338,7 +338,7 @@ export default function ProductDetailScreen({
                 fontFamily: 'var(--font-sans)', fontSize: '1.6rem', fontWeight: 900,
                 color: 'var(--primary)', letterSpacing: '0.5px'
               }}>
-                {product.contactNumber || '+91 98765 43210'}
+                {product.contactNumber || product.phone_number}
               </div>
 
               <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', margin: '8px 0 16px 0', fontFamily: 'var(--font-guj)' }}>
@@ -353,17 +353,17 @@ export default function ProductDetailScreen({
                 fontFamily: 'var(--font-guj)'
               }}>
                 <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-                જો કૉલ ન ઉઠે, તો "સંદેશ મોકલો" વડે chat કરો.
+                જો કૉલ ન ઉઠે, તો ચેટ બટન વડે વાત કરો.
               </div>
 
               <div style={{ display: 'flex', gap: 10 }}>
                 <a
-                  href={`tel:${product.contactNumber || '+919876543210'}`}
+                  href={`tel:${product.contactNumber || product.phone_number}`}
                   id="link-call-now"
                   className="btn-primary-lg"
                   style={{ textDecoration: 'none', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                 >
-                  <PhoneCall size={18} /> કૉલ કરો
+                  <PhoneCall size={18} /> વેચનારને કૉલ કરો
                 </a>
                 <button
                   id="btn-switch-to-chat"
@@ -375,7 +375,7 @@ export default function ProductDetailScreen({
                     fontFamily: 'var(--font-guj)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
                   }}
                 >
-                  <MessageSquare size={16} /> સંદેશ
+                  <MessageSquare size={16} /> ચેટ કરો
                 </button>
               </div>
             </div>

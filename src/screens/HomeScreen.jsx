@@ -187,7 +187,7 @@ export default function HomeScreen({
             <p className="hero-sub">
               તમારી પાસે ઉપયોગી વસ્તુ છે?
               <br />
-              તે કોઈની જરૂરિયાત બની શકે છે. સીધો સંપર્ક, ઝડપી ડીલ.
+              તે કોઈની જરૂરિયાત બની શકે છે. સીધો કૉલ, ઝડપી ડીલ.
             </p>
 
             <div className="hero-cta-group">
@@ -197,7 +197,7 @@ export default function HomeScreen({
                 onClick={onNavigateSell}
               >
                 <PlusCircle size={20} />
-                વસ્તુ વેચો
+                વેચાણ કરો
               </button>
               <button
                 id="btn-hero-browse"
@@ -205,7 +205,7 @@ export default function HomeScreen({
                 onClick={() => onSelectCategory('all')}
               >
                 <Search size={18} />
-                વસ્તુઓ શોધો
+                અમારી વસ્તુ
               </button>
             </div>
 
@@ -213,7 +213,7 @@ export default function HomeScreen({
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 32 }}>
               {[
                 { icon: '✅', text: 'મફત ઉમેરો' },
-                { icon: '📞', text: 'સીધો સંપર્ક' },
+                { icon: '📞', text: 'સીધો કૉલ' },
                 { icon: '🔒', text: 'સ્થાનિક લોકો' }
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
@@ -252,12 +252,12 @@ export default function HomeScreen({
                 icon: '🛡️',
                 bg: '#dbeafe',
                 title: 'વિશ્વાસ અને સુરક્ષા',
-                desc: 'સ્થાનિક લોકો સાથે સીધો સંપર્ક.'
+                desc: 'સ્થાનિક લોકો સાથે સીધી વાત.'
               },
               {
                 icon: '⚡',
                 bg: '#fff7ed',
-                title: 'ઝડપી સંપર્ક',
+                title: 'ઝડપી કૉલ',
                 desc: 'કૉલ અથવા સંદેશ દ્વારા વાત કરો.'
               },
               {
@@ -289,7 +289,7 @@ export default function HomeScreen({
               { number: '10,000+', label: 'વસ્તુઓ ઉપલબ્ધ' },
               { number: '5,000+', label: 'સક્રિય સભ્યો' },
               { number: '2,500+', label: 'વસ્તુઓ વેચાઈ' },
-              { number: '8,000+', label: 'સફળ સંપર્ક' }
+              { number: '8,000+', label: 'સફળ ડીલ' }
             ].map((s, i) => (
               <div key={i} className="stat-item">
                 <span className="stat-number">{s.number}</span>
@@ -554,8 +554,8 @@ function ProductCard({ prod, onSelect }) {
 
   const condClass = prod.condition === 'નવી' ? 'new'
     : prod.condition === 'સારી સ્થિતિ' ? 'good'
-    : prod.condition === 'સામાન્ય સ્થિતિ' ? 'fair'
-    : 'good';
+      : prod.condition === 'સામાન્ય સ્થિતિ' ? 'fair'
+        : 'good';
 
   return (
     <div className="product-card" onClick={onSelect} id={`prod-card-${prod.id}`}>

@@ -1,3 +1,4 @@
+// TEST
 import React, { useState, useEffect } from 'react';
 import DesktopHeader from './components/DesktopHeader';
 import Footer from './components/Footer';
@@ -80,12 +81,10 @@ export default function App() {
   useEffect(() => {
     async function loadInitialData() {
       setLoadingProducts(true);
-      // Fetch Products
+      // Fetch Products from Supabase DB (shared across all users)
       const { products: dbProducts } = await productService.getProducts();
-      if (dbProducts && dbProducts.length > 0) {
+      if (dbProducts) {
         setProducts(dbProducts);
-      } else {
-        setProducts(INITIAL_PRODUCTS);
       }
       setLoadingProducts(false);
 
@@ -136,8 +135,14 @@ export default function App() {
     }
   };
 
-  const handlePublishProduct = (newProd) => {
-    setProducts([newProd, ...products]);
+  const handlePublishProduct = async (newProd) => {
+    // Re-fetch latest shared products from Supabase DB
+    const { products: dbProducts } = await productService.getProducts();
+    if (dbProducts && dbProducts.length > 0) {
+      setProducts(dbProducts);
+    } else if (newProd) {
+      setProducts(prev => [newProd, ...prev]);
+    }
     setSelectedProduct(newProd);
     setCurrentTab('productDetail');
     window.scrollTo({ top: 0, behavior: 'smooth' });

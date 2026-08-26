@@ -32,7 +32,7 @@ export default function Footer({ setCurrentTab }) {
               </div>
             </div>
             <p style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, maxWidth: 320, fontFamily: 'var(--font-guj)' }}>
-              "વસ્તુઓ આપો, જરૂરિયાત પૂરી કરો." — સ્થાનિક લોકો સાથે સીધો સંપર્ક, ઝડપી ડીલ, અને ₹0 ચાર્જ.
+              "વસ્તુઓ આપો, જરૂરિયાત પૂરી કરો." — સ્થાનિક લોકો સાથે સીધી વાત, ઝડપી ડીલ, અને ₹0 ચાર્જ.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.82rem', color: 'rgba(255,255,255,0.55)' }}>

@@ -4,7 +4,7 @@ import { INITIAL_PRODUCTS } from '../data/mockData';
 // Image Compression Helper
 const compressImage = (file, maxWidth = 1000, quality = 0.8) => {
   return new Promise((resolve) => {
-    if (!file.type.startsWith('image/')) return resolve(file);
+    if (!file || !file.type || !file.type.startsWith('image/')) return resolve(file);
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -55,7 +55,7 @@ export const productService = {
 
     try {
       const compressedFile = await compressImage(file);
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name ? file.name.split('.').pop() : 'jpg';
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `products/${fileName}`;
 
@@ -64,7 +64,7 @@ export const productService = {
         .upload(filePath, compressedFile);
 
       if (error) {
-        console.warn('Storage bucket upload failed, converting to Data URL:', error.message);
+        console.warn('Storage bucket upload failed, using Data URL fallback:', error.message);
         return new Promise((resolve) => {
           const reader = new FileReader();
           reader.onloadend = () => resolve(reader.result);
@@ -79,19 +79,25 @@ export const productService = {
       return publicUrl;
     } catch (err) {
       console.error('Image upload error:', err);
-      throw err;
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
     }
   },
 
-  // Fetch products with search, filter, and sorting
+  // Fetch published products for ALL users (shared marketplace database)
   async getProducts({ category, searchQuery, condition, minPrice, maxPrice, sortBy, sellerId } = {}) {
     if (!isSupabaseConfigured()) {
-      let filtered = [...INITIAL_PRODUCTS];
-      if (sellerId) filtered = filtered.filter(p => p.sellerId === sellerId);
+      const savedStr = localStorage.getItem('sathsarkaar_products');
+      let filtered = savedStr ? JSON.parse(savedStr) : [...INITIAL_PRODUCTS];
+
+      if (sellerId) filtered = filtered.filter(p => p.sellerId === sellerId || p.seller_id === sellerId);
       if (category && category !== 'all') filtered = filtered.filter(p => p.category === category);
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        filtered = filtered.filter(p => p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.location.toLowerCase().includes(q));
+        filtered = filtered.filter(p => p.title.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.location?.toLowerCase().includes(q));
       }
       if (condition) filtered = filtered.filter(p => p.condition === condition);
       if (minPrice) filtered = filtered.filter(p => p.price >= Number(minPrice));
@@ -107,7 +113,7 @@ export const productService = {
         .from('products')
         .select(`
           *,
-          seller:profiles!products_seller_id_fkey(full_name, phone, avatar_url, city),
+          seller:profiles(full_name, phone, avatar_url, city),
           product_images(image_url, sort_order)
         `)
         .eq('is_active', true);
@@ -129,7 +135,7 @@ export const productService = {
       const { data, error } = await query;
       if (error) throw error;
 
-      const formattedProducts = data.map(item => {
+      const formattedProducts = (data || []).map(item => {
         const imagesArr = item.product_images && item.product_images.length > 0
           ? item.product_images.sort((a, b) => a.sort_order - b.sort_order).map(img => img.image_url)
           : ['https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80'];
@@ -144,10 +150,12 @@ export const productService = {
           location: item.location || item.city || 'અમદાવાદ',
           description: item.description,
           quantity: item.quantity,
-          contactNumber: item.phone_number || item.seller?.phone || '+91 98765 43210',
+          contactNumber: item.phone_number || item.seller?.phone || '',
+          phone_number: item.phone_number || item.seller?.phone || '',
           deliveryOption: item.delivery_option || 'સ્થાનિક પિકઅપ',
           status: item.status || (item.quantity <= 0 ? 'sold' : 'available'),
           sellerId: item.seller_id,
+          seller_id: item.seller_id,
           sellerName: item.seller?.full_name || 'સ્થાનિક ગ્રાહક',
           sellerAvatar: item.seller?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
           postedDate: new Date(item.created_at).toLocaleDateString('gu-IN', { month: 'short', day: 'numeric' }),
@@ -163,26 +171,46 @@ export const productService = {
     }
   },
 
-  // Create new product
+  // Create new product in Supabase DB (verifying real authenticated seller_id)
   async createProduct(productData, imageFiles = []) {
     if (!isSupabaseConfigured()) {
       const imagesArr = [];
       for (const file of imageFiles) {
-        imagesArr.push(URL.createObjectURL(file));
+        if (typeof file === 'string') {
+          imagesArr.push(file);
+        } else {
+          imagesArr.push(URL.createObjectURL(file));
+        }
       }
+
+      const savedStr = localStorage.getItem('sathsarkaar_products');
+      const existingProds = savedStr ? JSON.parse(savedStr) : [...INITIAL_PRODUCTS];
 
       const newProd = {
         id: `prod-${Date.now()}`,
         ...productData,
+        seller_id: productData.sellerId,
+        sellerId: productData.sellerId,
         images: imagesArr.length ? imagesArr : ['https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80'],
         postedDate: 'હમણાં',
         status: 'available'
       };
+
+      const updatedProds = [newProd, ...existingProds];
+      localStorage.setItem('sathsarkaar_products', JSON.stringify(updatedProds));
       return { product: newProd, error: null };
     }
 
     try {
-      // 1. Upload images
+      // 1. Get authenticated user ID
+      const { data: authData } = await supabase.auth.getUser();
+      const authenticatedUserId = authData?.user?.id || productData.sellerId;
+
+      if (!authenticatedUserId) {
+        throw new Error('વસ્તુ પ્રકાશિત કરવા માટે લૉગિન કરવું જરૂરી છે.');
+      }
+
+      // 2. Upload images to Supabase Storage
       const imageUrls = [];
       for (const file of imageFiles) {
         const url = await this.uploadImage(file);
@@ -193,11 +221,11 @@ export const productService = {
         imageUrls.push('https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80');
       }
 
-      // 2. Insert product record
+      // 3. Insert product record in Supabase DB
       const { data: product, error: prodError } = await supabase
         .from('products')
         .insert({
-          seller_id: productData.sellerId,
+          seller_id: authenticatedUserId,
           title: productData.title,
           category: productData.category,
           description: productData.description,
@@ -209,14 +237,21 @@ export const productService = {
           quantity: Number(productData.quantity || 1),
           phone_number: productData.phone_number || productData.contactNumber,
           delivery_option: productData.deliveryOption || 'સ્થાનિક પિકઅપ',
+          is_active: true,
           status: 'available'
         })
-        .select()
+        .select(`
+          *,
+          seller:profiles(full_name, phone, avatar_url, city)
+        `)
         .single();
 
-      if (prodError) throw prodError;
+      if (prodError) {
+        console.error('Database product insert error:', prodError);
+        throw new Error('એકાઉન્ટમાંથી વસ્તુ ઉમેરવામાં ક્ષતિ આવી. કૃપા કરીને ફરી પ્રયાસ કરો.');
+      }
 
-      // 3. Insert product images
+      // 4. Insert product images in DB
       const imageRecords = imageUrls.map((url, idx) => ({
         product_id: product.id,
         image_url: url,
@@ -225,22 +260,49 @@ export const productService = {
 
       await supabase.from('product_images').insert(imageRecords);
 
+      const formattedProduct = {
+        id: product.id,
+        title: product.title,
+        category: product.category,
+        price: Number(product.price),
+        condition: product.condition,
+        brand: product.brand || '',
+        location: product.location || product.city || 'અમદાવાદ',
+        description: product.description,
+        quantity: product.quantity,
+        contactNumber: product.phone_number || productData.contactNumber,
+        phone_number: product.phone_number || productData.contactNumber,
+        deliveryOption: product.delivery_option || 'સ્થાનિક પિકઅપ',
+        status: product.status || 'available',
+        sellerId: product.seller_id,
+        seller_id: product.seller_id,
+        sellerName: product.seller?.full_name || productData.sellerName || 'સ્થાનિક ગ્રાહક',
+        sellerAvatar: product.seller?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        postedDate: 'હમણાં',
+        createdAt: product.created_at,
+        images: imageUrls
+      };
+
       return {
-        product: {
-          ...product,
-          images: imageUrls
-        },
+        product: formattedProduct,
         error: null
       };
     } catch (err) {
       console.error('Create product error:', err);
-      return { product: null, error: err.message || 'વસ્તુ પ્રકાશિત કરવામાં નિષ્ફળતા આવી.' };
+      return { product: null, error: err.message || 'વસ્તુ પ્રકાશિત કરવામાં ક્ષતિ આવી.' };
     }
   },
 
   // Mark product as sold
   async markAsSold(productId) {
-    if (!isSupabaseConfigured()) return { success: true };
+    if (!isSupabaseConfigured()) {
+      const savedStr = localStorage.getItem('sathsarkaar_products');
+      if (savedStr) {
+        const prods = JSON.parse(savedStr).map(p => p.id === productId ? { ...p, status: 'sold', quantity: 0 } : p);
+        localStorage.setItem('sathsarkaar_products', JSON.stringify(prods));
+      }
+      return { success: true };
+    }
 
     try {
       const { error } = await supabase
@@ -256,9 +318,16 @@ export const productService = {
     }
   },
 
-  // Delete product
+  // Delete product (only allowed if seller_id === auth.uid())
   async deleteProduct(productId) {
-    if (!isSupabaseConfigured()) return { success: true };
+    if (!isSupabaseConfigured()) {
+      const savedStr = localStorage.getItem('sathsarkaar_products');
+      if (savedStr) {
+        const prods = JSON.parse(savedStr).filter(p => p.id !== productId);
+        localStorage.setItem('sathsarkaar_products', JSON.stringify(prods));
+      }
+      return { success: true };
+    }
 
     try {
       const { error } = await supabase

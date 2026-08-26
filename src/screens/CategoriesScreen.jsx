@@ -36,10 +36,10 @@ export default function CategoriesScreen({ products, onSelectCategory, onSelectP
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.5px', fontFamily: 'var(--font-guj)', color: 'var(--text-primary)' }}>
-          🔍 વસ્તુઓ શોધો
+          🛍️ અમારી વસ્તુ
         </h1>
         <p style={{ fontSize: '0.96rem', color: 'var(--text-secondary)', marginTop: 4, fontFamily: 'var(--font-guj)' }}>
-          6 શ્રેણીઓ — ઇલેક્ટ્રોનિક્સ, ફર્નિચર, પુસ્તકો, ઘરવપરાશ, રસોડું, કપડાં
+          સ્થાનિક લોકોએ વેચાણ માટે મૂકેલી નવી અને વપરાયેલી વસ્તુઓ
         </p>
       </div>
 

@@ -4,7 +4,7 @@ export const authService = {
   // Sign up new user with full profile metadata
   async signUp({ email, password, fullName, phone, city = 'અમદાવાદ', area = '', avatarUrl = '' }) {
     if (!isSupabaseConfigured()) {
-      // Dev mode fallback mock user
+      // Offline / Local dev fallback
       const mockUser = {
         id: `usr-${Date.now()}`,
         email,
@@ -33,10 +33,12 @@ export const authService = {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error('એકાઉન્ટ બનાવવામાં સમસ્યા આવી. કૃપા કરીને ફરી પ્રયાસ કરો.');
+      }
 
       if (data?.user) {
-        // Also insert into profiles table directly to ensure profile exists
+        // Also insert/upsert into profiles table directly
         const profileData = {
           id: data.user.id,
           full_name: fullName,
@@ -52,7 +54,7 @@ export const authService = {
       return { user: data.user, session: data.session, error: null };
     } catch (err) {
       console.error('Signup error:', err);
-      return { user: null, error: err.message || 'સાઇન અપ કરવામાં સમસ્યા આવી.' };
+      return { user: null, error: err.message || 'એકાઉન્ટ બનાવવામાં સમસ્યા આવી. કૃપા કરીને ફરી પ્રયાસ કરો.' };
     }
   },
 
@@ -77,7 +79,9 @@ export const authService = {
         password
       });
 
-      if (error) throw error;
+      if (error) {
+        throw new Error('ઈમેલ અથવા પાસવર્ડ ખોટો છે.');
+      }
 
       // Fetch user profile
       const profile = await this.getProfile(data.user.id);
@@ -89,7 +93,7 @@ export const authService = {
       };
     } catch (err) {
       console.error('Login error:', err);
-      return { user: null, error: err.message || 'ઇમેઇલ અથવા પાસવર્ડ ખોટો છે.' };
+      return { user: null, error: err.message || 'ઈમેલ અથવા પાસવર્ડ ખોટો છે.' };
     }
   },
 
@@ -115,7 +119,7 @@ export const authService = {
   // Password reset email
   async resetPassword(email) {
     if (!isSupabaseConfigured()) {
-      return { success: true, message: 'રીસેટ લિંક મોકલવામાં આવી.' };
+      return { success: true, message: 'પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેલ પર મોકલવામાં આવી છે.' };
     }
 
     try {
@@ -127,7 +131,7 @@ export const authService = {
       return { success: true, error: null };
     } catch (err) {
       console.error('Password reset error:', err);
-      return { success: false, error: err.message || 'રીસેટ લિંક મોકલવામાં સમસ્યા આવી.' };
+      return { success: false, error: 'પાસવર્ડ રીસેટ કરવામાં સમસ્યા આવી.' };
     }
   },
 
@@ -230,7 +234,7 @@ export const authService = {
 
   // Auth State Listener
   onAuthStateChange(callback) {
-    if (!isSupabaseConfigured()) return () => {};
+    if (!isSupabaseConfigured()) return () => { };
     return supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const profile = await this.getProfile(session.user.id);

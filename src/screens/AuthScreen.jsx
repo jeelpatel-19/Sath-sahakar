@@ -3,33 +3,19 @@ import { Mail, Lock, User, Phone, MapPin, CheckCircle2, ArrowRight, Shield, Aler
 import { authService } from '../services/authService';
 
 export default function AuthScreen({ onAuthSuccess }) {
-  // 'email-login' | 'phone-login' | 'signup' | 'forgot'
+  // 'email-login' | 'signup' | 'forgot'
   const [mode, setMode] = useState('email-login');
 
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const [otpToken, setOtpToken] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-
   const [name, setName] = useState('');
   const [city, setCity] = useState('અમદાવાદ');
-  const [area, setArea] = useState('');
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setAvatarFile(file);
-      setAvatarPreview(URL.createObjectURL(file));
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,49 +26,22 @@ export default function AuthScreen({ onAuthSuccess }) {
     try {
       if (mode === 'email-login') {
         if (!email || !password) {
-          throw new Error('કૃપા કરીને ઇ-મેઇલ અને પાસવર્ડ દાખલ કરો.');
+          throw new Error('કૃપા કરીને ઈમેલ અને પાસવર્ડ દાખલ કરો.');
         }
         const { user, error } = await authService.signIn({ email, password });
-        if (error) throw new Error(error);
-
-        setSuccessMessage('લૉગ ઇન સફળ! હોમપેજ પર જઈ રહ્યા છીએ...');
-        setTimeout(() => onAuthSuccess(user), 1000);
-
-      } else if (mode === 'phone-login') {
-        if (!otpSent) {
-          if (!phone || phone.length < 10) {
-            throw new Error('કૃપા કરીને માન્ય મોબાઇલ નંબર દાખલ કરો.');
-          }
-          const { success, error } = await authService.signInWithPhone(phone);
-          if (!success) throw new Error(error);
-          setOtpSent(true);
-          setSuccessMessage('તમારા મોબાઇલ પર OTP મોકલવામાં આવ્યો છે.');
-        } else {
-          if (!otpToken) throw new Error('કૃપા કરીને OTP દાખલ કરો.');
-          // Process OTP login
-          const mockPhoneUser = {
-            id: `usr-phone-${Date.now()}`,
-            name: `ગ્રાહક (${phone.slice(-4)})`,
-            phone: phone,
-            city: city,
-            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-          };
-          localStorage.setItem('sathsarkaar_user', JSON.stringify(mockPhoneUser));
-          setSuccessMessage('OTP સફળતાપૂર્વક ચકાસાયો!');
-          setTimeout(() => onAuthSuccess(mockPhoneUser), 1000);
+        if (error) {
+          throw new Error('ઈમેલ અથવા પાસવર્ડ ખોટો છે.');
         }
+
+        setSuccessMessage('લૉગ ઇન સફળ!');
+        setTimeout(() => onAuthSuccess(user), 800);
 
       } else if (mode === 'signup') {
         if (!name || !email || !password || !phone) {
-          throw new Error('કૃપા કરીને બધી જરૂરી માહિતી (*) ભરો.');
+          throw new Error('કૃપા કરીને બધી જરૂરી માહિતી ભરો.');
         }
         if (password.length < 6) {
           throw new Error('પાસવર્ડ ઓછામાં ઓછો 6 અક્ષરનો હોવો જોઈએ.');
-        }
-
-        let avatarUrl = '';
-        if (avatarPreview) {
-          avatarUrl = avatarPreview;
         }
 
         const { user, error } = await authService.signUp({
@@ -90,24 +49,24 @@ export default function AuthScreen({ onAuthSuccess }) {
           password,
           fullName: name,
           phone,
-          city,
-          area,
-          avatarUrl
+          city
         });
 
-        if (error) throw new Error(error);
+        if (error) {
+          throw new Error('એકાઉન્ટ બનાવવામાં સમસ્યા આવી. કૃપા કરીને ફરી પ્રયાસ કરો.');
+        }
 
-        setSuccessMessage('ખૂબ ખૂબ અભિનંદન! એકાઉન્ટ સફળતાપૂર્વક બન્યું.');
-        setTimeout(() => onAuthSuccess(user), 1200);
+        setSuccessMessage('તમારું એકાઉન્ટ સફળતાપૂર્વક બનાવવામાં આવ્યું.');
+        setTimeout(() => onAuthSuccess(user), 1000);
 
       } else if (mode === 'forgot') {
-        if (!email) throw new Error('કૃપા કરીને તમારો ઇ-મેઇલ દાખલ કરો.');
+        if (!email) throw new Error('કૃપા કરીને તમારો ઈમેલ દાખલ કરો.');
         const { success, error } = await authService.resetPassword(email);
         if (!success) throw new Error(error);
-        setSuccessMessage('પાસવર્ડ રીસેટ લિંક તમારા ઇ-મેઇલ પર મોકલવામાં આવી છે.');
+        setSuccessMessage('પાસવર્ડ રીસેટ કરવાની લિંક તમારા ઈમેલ પર મોકલવામાં આવી છે.');
       }
     } catch (err) {
-      setErrorMessage(err.message || 'પ્રક્રિયામાં ભૂલ આવી.');
+      setErrorMessage(err.message || 'ઈમેલ અથવા પાસવર્ડ ખોટો છે.');
     } finally {
       setLoading(false);
     }
@@ -119,7 +78,7 @@ export default function AuthScreen({ onAuthSuccess }) {
       background: 'linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%)',
       display: 'flex',
       alignItems: 'center',
-      justify: 'center',
+      justifyContent: 'center',
       padding: '24px 16px',
       position: 'relative',
       overflow: 'hidden'
@@ -130,7 +89,7 @@ export default function AuthScreen({ onAuthSuccess }) {
 
       <div style={{
         width: '100%',
-        maxWidth: 480,
+        maxWidth: 460,
         background: '#ffffff',
         borderRadius: 24,
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
@@ -139,10 +98,10 @@ export default function AuthScreen({ onAuthSuccess }) {
         zIndex: 10,
         border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
-        {/* Header Branding */}
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+        {/* Branding */}
+        <div style={{ textAlign: 'center', marginBottom: 26 }}>
           <div style={{
-            width: 60, height: 60,
+            width: 58, height: 58,
             background: 'linear-gradient(135deg, #059669, #047857)',
             borderRadius: 18,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -167,55 +126,13 @@ export default function AuthScreen({ onAuthSuccess }) {
           </p>
         </div>
 
-        {/* Login Method Tabs */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: '1fr 1fr 1.1fr', gap: 4,
-          background: '#f3f4f6', padding: 5, borderRadius: 12, marginBottom: 24
-        }}>
-          <button
-            type="button"
-            onClick={() => { setMode('email-login'); setErrorMessage(''); setSuccessMessage(''); }}
-            style={{
-              padding: '9px 6px', border: 'none', borderRadius: 8,
-              fontSize: '0.82rem', fontWeight: 800, fontFamily: 'var(--font-guj)',
-              cursor: 'pointer', transition: 'all 0.2s ease',
-              background: mode === 'email-login' ? '#ffffff' : 'transparent',
-              color: mode === 'email-login' ? '#059669' : '#6b7280',
-              boxShadow: mode === 'email-login' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none'
-            }}
-          >
-            Email લૉગિન
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setMode('phone-login'); setErrorMessage(''); setSuccessMessage(''); }}
-            style={{
-              padding: '9px 6px', border: 'none', borderRadius: 8,
-              fontSize: '0.82rem', fontWeight: 800, fontFamily: 'var(--font-guj)',
-              cursor: 'pointer', transition: 'all 0.2s ease',
-              background: mode === 'phone-login' ? '#ffffff' : 'transparent',
-              color: mode === 'phone-login' ? '#059669' : '#6b7280',
-              boxShadow: mode === 'phone-login' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none'
-            }}
-          >
-            મોબાઇલ OTP
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setMode('signup'); setErrorMessage(''); setSuccessMessage(''); }}
-            style={{
-              padding: '9px 6px', border: 'none', borderRadius: 8,
-              fontSize: '0.82rem', fontWeight: 800, fontFamily: 'var(--font-guj)',
-              cursor: 'pointer', transition: 'all 0.2s ease',
-              background: mode === 'signup' ? '#ffffff' : 'transparent',
-              color: mode === 'signup' ? '#059669' : '#6b7280',
-              boxShadow: mode === 'signup' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none'
-            }}
-          >
-            નવું એકાઉન્ટ
-          </button>
+        {/* Form Title Header */}
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'var(--font-guj)', color: '#111827', margin: 0 }}>
+            {mode === 'email-login' && 'તમારા એકાઉન્ટમાં લોગિન કરો'}
+            {mode === 'signup' && 'નવું એકાઉન્ટ બનાવો'}
+            {mode === 'forgot' && 'પાસવર્ડ રીસેટ કરો'}
+          </h2>
         </div>
 
         {/* Error Alert */}
@@ -246,43 +163,6 @@ export default function AuthScreen({ onAuthSuccess }) {
 
         {/* Form Body */}
         <form onSubmit={handleSubmit}>
-          {/* Avatar Upload during Signup */}
-          {mode === 'signup' && (
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <div style={{ position: 'relative', width: 76, height: 76, margin: '0 auto 8px auto' }}>
-                <div style={{
-                  width: '100%', height: '100%', borderRadius: '50%',
-                  background: '#f3f4f6', overflow: 'hidden',
-                  border: '3px solid #059669', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                  {avatarPreview ? (
-                    <img src={avatarPreview} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <User size={34} color="#9ca3af" />
-                  )}
-                </div>
-                <label htmlFor="avatar-upload-input" style={{
-                  position: 'absolute', bottom: 0, right: 0,
-                  width: 26, height: 26, background: '#f97316', color: '#fff',
-                  borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
-                  <Camera size={14} />
-                </label>
-                <input
-                  id="avatar-upload-input"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  style={{ display: 'none' }}
-                />
-              </div>
-              <span style={{ fontSize: '0.78rem', color: '#6b7280', fontFamily: 'var(--font-guj)' }}>
-                પ્રોફાઇલ ફોટો ઉમેરો (મરજિયાત)
-              </span>
-            </div>
-          )}
-
           {/* Signup Name */}
           {mode === 'signup' && (
             <div className="form-group">
@@ -301,26 +181,24 @@ export default function AuthScreen({ onAuthSuccess }) {
             </div>
           )}
 
-          {/* Email input for email-login, signup, forgot */}
-          {mode !== 'phone-login' && (
-            <div className="form-group">
-              <label className="form-label">
-                <Mail size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />
-                ઇ-મેઇલ સરનામું *
-              </label>
-              <input
-                type="email"
-                className="form-input"
-                placeholder="you@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          )}
+          {/* Email input */}
+          <div className="form-group">
+            <label className="form-label">
+              <Mail size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />
+              ઈમેલ *
+            </label>
+            <input
+              type="email"
+              className="form-input"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-          {/* Phone input for phone-login or signup */}
-          {(mode === 'phone-login' || mode === 'signup') && (
+          {/* Phone input for signup */}
+          {mode === 'signup' && (
             <div className="form-group">
               <label className="form-label">
                 <Phone size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />
@@ -337,77 +215,14 @@ export default function AuthScreen({ onAuthSuccess }) {
             </div>
           )}
 
-          {/* Phone OTP Token field */}
-          {mode === 'phone-login' && otpSent && (
-            <div className="form-group">
-              <label className="form-label">
-                OTP કોડ (6 અંક) *
-              </label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="123456"
-                maxLength={6}
-                value={otpToken}
-                onChange={e => setOtpToken(e.target.value)}
-                required
-              />
-            </div>
-          )}
-
-          {/* Location fields for signup */}
-          {mode === 'signup' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div className="form-group">
-                <label className="form-label">
-                  <MapPin size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                  શહેર *
-                </label>
-                <select
-                  className="form-select"
-                  value={city}
-                  onChange={e => setCity(e.target.value)}
-                >
-                  {['અમદાવાદ', 'સુરત', 'વડોદરા', 'રાજકોટ', 'ભાવનગર', 'જામનગર', 'ગાંધીનગર', 'આણંદ'].map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">વિસ્તાર / એરિયા</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="ઉદા. સેટેલાઇટ"
-                  value={area}
-                  onChange={e => setArea(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-
           {/* Password field */}
-          {(mode === 'email-login' || mode === 'signup') && (
+          {mode !== 'forgot' && (
             <div className="form-group">
               <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>
                   <Lock size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />
                   પાસવર્ડ *
                 </span>
-                {mode === 'email-login' && (
-                  <button
-                    type="button"
-                    onClick={() => { setMode('forgot'); setErrorMessage(''); }}
-                    style={{
-                      background: 'none', border: 'none', color: '#059669',
-                      fontSize: '0.78rem', fontWeight: 800, cursor: 'pointer',
-                      fontFamily: 'var(--font-guj)'
-                    }}
-                  >
-                    પાસવર્ડ ભૂલી ગયા?
-                  </button>
-                )}
               </label>
               <input
                 type="password"
@@ -446,9 +261,8 @@ export default function AuthScreen({ onAuthSuccess }) {
               </>
             ) : (
               <>
-                {mode === 'email-login' && 'માર્કેટપ્લેસમાં લૉગ ઇન કરો'}
-                {mode === 'phone-login' && (otpSent ? 'OTP ચકાસો' : 'OTP મોકલો')}
-                {mode === 'signup' && 'નવું એકાઉન્ટ બનાવો'}
+                {mode === 'email-login' && 'લોગિન'}
+                {mode === 'signup' && 'એકાઉન્ટ બનાવો'}
                 {mode === 'forgot' && 'રીસેટ લિંક મોકલો'}
                 <ArrowRight size={18} />
               </>
@@ -456,10 +270,42 @@ export default function AuthScreen({ onAuthSuccess }) {
           </button>
         </form>
 
-        {/* Footer info */}
+        {/* Footer Navigation Links */}
+        <div style={{ marginTop: 22, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {mode === 'email-login' && (
+            <>
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setErrorMessage(''); setSuccessMessage(''); }}
+                style={{ background: 'none', border: 'none', color: '#059669', fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'var(--font-guj)' }}
+              >
+                નવું એકાઉન્ટ બનાવો
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMode('forgot'); setErrorMessage(''); setSuccessMessage(''); }}
+                style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '0.84rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-guj)' }}
+              >
+                પાસવર્ડ ભૂલી ગયા?
+              </button>
+            </>
+          )}
+
+          {(mode === 'signup' || mode === 'forgot') && (
+            <button
+              type="button"
+              onClick={() => { setMode('email-login'); setErrorMessage(''); setSuccessMessage(''); }}
+              style={{ background: 'none', border: 'none', color: '#059669', fontSize: '0.9rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'var(--font-guj)' }}
+            >
+              ← પાછા લોગિન પર જાઓ
+            </button>
+          )}
+        </div>
+
+        {/* Security Badge */}
         <div style={{
-          marginTop: 24, paddingTop: 18, borderTop: '1px solid #f3f4f6',
-          textAlign: 'center', fontSize: '0.8rem', color: '#6b7280',
+          marginTop: 24, paddingTop: 16, borderTop: '1px solid #f3f4f6',
+          textAlign: 'center', fontSize: '0.78rem', color: '#6b7280',
           fontFamily: 'var(--font-guj)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5
         }}>
           <Shield size={14} color="#059669" />

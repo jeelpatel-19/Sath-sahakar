@@ -70,7 +70,7 @@ export default function DesktopHeader({
             className={`nav-link ${currentTab === 'categories' ? 'active' : ''}`}
             onClick={() => setCurrentTab('categories')}
           >
-            વસ્તુઓ શોધો
+            અમારી વસ્તુ
           </button>
 
           <button
@@ -78,7 +78,7 @@ export default function DesktopHeader({
             className={`nav-link ${currentTab === 'sell' ? 'active' : ''}`}
             onClick={() => setCurrentTab('sell')}
           >
-            વસ્તુ વેચો
+            વેચાણ કરો
           </button>
 
           <button
@@ -96,7 +96,7 @@ export default function DesktopHeader({
             onClick={() => setCurrentTab('messages')}
           >
             <MessageSquare size={14} />
-            સંદેશા
+            ચેટ
             {unreadMessagesCount > 0 && (
               <span className="badge-count">{unreadMessagesCount}</span>
             )}
@@ -108,14 +108,6 @@ export default function DesktopHeader({
             onClick={() => setCurrentTab('about')}
           >
             અમારા વિશે
-          </button>
-
-          <button
-            id="nav-contact"
-            className={`nav-link ${currentTab === 'contact' ? 'active' : ''}`}
-            onClick={() => setCurrentTab('contact')}
-          >
-            સંપર્ક
           </button>
 
           <button
@@ -138,7 +130,7 @@ export default function DesktopHeader({
             onClick={() => setCurrentTab('sell')}
           >
             <PlusCircle size={16} />
-            વસ્તુ વેચો
+            વેચાણ કરો
           </button>
 
           {currentUser ? (
