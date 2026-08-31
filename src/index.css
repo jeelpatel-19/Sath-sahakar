@@ -1348,6 +1348,123 @@ html, body {
   }
 }
 
+/* Responsive Form & Dashboard Grids */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+}
+
+.sell-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+.dashboard-banner {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-item-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-xs);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.4fr;
+  gap: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sell-photo-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .dashboard-banner {
+    padding: 16px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-item-card {
+    padding: 14px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-bottom: 32px;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-search {
+    max-width: 140px;
+  }
+  .brand-logo-name {
+    font-size: 1rem;
+  }
+  .brand-logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
 /* Fixed Bottom Mobile Navigation Bar */
 .bottom-nav {
   position: fixed;

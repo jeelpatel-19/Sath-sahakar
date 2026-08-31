@@ -136,13 +136,7 @@ export default function UserDashboard({
   return (
     <div className="desktop-container main-content" style={{ paddingTop: 36 }}>
       {/* Top Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
-        border: '1px solid rgba(22,163,74,0.2)', borderRadius: 'var(--radius-lg)',
-        padding: '28px 36px', marginBottom: 24,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        boxShadow: 'var(--shadow-sm)'
-      }}>
+      <div className="dashboard-banner">
         <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
           <div style={{
             width: 64, height: 64, borderRadius: '50%',
@@ -210,16 +204,7 @@ export default function UserDashboard({
               {myProducts.map(prod => {
                 const isSold = prod.status === 'sold';
                 return (
-                  <div key={prod.id} style={{
-                    background: '#ffffff', border: '1px solid var(--border-color)',
-                    borderRadius: 'var(--radius-md)', padding: '18px 24px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    opacity: isSold ? 0.72 : 1, boxShadow: 'var(--shadow-xs)',
-                    transition: 'var(--transition)'
-                  }}
-                    onMouseOver={e => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                    onMouseOut={e => { e.currentTarget.style.boxShadow = 'var(--shadow-xs)'; }}
-                  >
+                  <div key={prod.id} className="dashboard-item-card" style={{ opacity: isSold ? 0.72 : 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 18, flex: 1 }}>
                       <img
                         src={prod.images?.[0] || 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=200'}

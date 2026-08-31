@@ -237,7 +237,7 @@ export default function SellItemPage({ onPublishProduct, currentUser }) {
           </div>
 
           {/* Category & Brand Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+          <div className="form-grid-2">
             <div className="form-group">
               <label className="form-label">કેટેગરી *</label>
               <select
@@ -265,7 +265,7 @@ export default function SellItemPage({ onPublishProduct, currentUser }) {
           </div>
 
           {/* Price & Quantity & Condition Row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18 }}>
+          <div className="form-grid-3">
             <div className="form-group">
               <label className="form-label">કિંમત (₹) *</label>
               <input
@@ -326,7 +326,7 @@ export default function SellItemPage({ onPublishProduct, currentUser }) {
               📍 સ્થળ અને મોબાઇલ નંબરની વિગતો
             </h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+            <div className="form-grid-3">
               <div className="form-group">
                 <label className="form-label">વેચનારનું નામ *</label>
                 <input

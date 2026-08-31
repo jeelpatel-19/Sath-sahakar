@@ -6,13 +6,7 @@ export default function Footer({ setCurrentTab }) {
   return (
     <footer className="desktop-footer">
       <div className="desktop-container">
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr 1fr 1.4fr',
-          gap: 48,
-          paddingBottom: 48,
-          borderBottom: '1px solid rgba(255,255,255,0.1)'
-        }}>
+        <div className="footer-grid">
 
           {/* Brand Column */}
           <div>
