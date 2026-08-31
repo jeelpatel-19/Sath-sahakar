@@ -111,14 +111,11 @@ export const productService = {
     try {
       let query = supabase
         .from('products')
-        .select(`
-          *,
-          seller:profiles(full_name, phone, avatar_url, city),
-          product_images(image_url, sort_order)
-        `)
-        .eq('is_active', true);
+        .select('*');
 
-      if (sellerId) query = query.eq('seller_id', sellerId);
+      if (sellerId) {
+        query = query.eq('seller_id', sellerId);
+      }
       if (category && category !== 'all') query = query.eq('category', category);
       if (condition) query = query.eq('condition', condition);
       if (minPrice) query = query.gte('price', Number(minPrice));
@@ -135,9 +132,39 @@ export const productService = {
       const { data, error } = await query;
       if (error) throw error;
 
+      // Fetch product images for all retrieved products
+      const productIds = (data || []).map(p => p.id);
+      let imagesMap = {};
+      if (productIds.length > 0) {
+        const { data: imgData } = await supabase
+          .from('product_images')
+          .select('product_id, image_url, sort_order')
+          .in('product_id', productIds);
+
+        (imgData || []).forEach(img => {
+          if (!imagesMap[img.product_id]) imagesMap[img.product_id] = [];
+          imagesMap[img.product_id].push(img.image_url);
+        });
+      }
+
+      // Fetch seller profiles for all retrieved products
+      const sellerIds = [...new Set((data || []).map(p => p.seller_id).filter(Boolean))];
+      let profilesMap = {};
+      if (sellerIds.length > 0) {
+        const { data: profData } = await supabase
+          .from('profiles')
+          .select('id, full_name, phone, avatar_url, city')
+          .in('id', sellerIds);
+
+        (profData || []).forEach(prof => {
+          profilesMap[prof.id] = prof;
+        });
+      }
+
       const formattedProducts = (data || []).map(item => {
-        const imagesArr = item.product_images && item.product_images.length > 0
-          ? item.product_images.sort((a, b) => a.sort_order - b.sort_order).map(img => img.image_url)
+        const sellerObj = profilesMap[item.seller_id] || {};
+        const imagesArr = imagesMap[item.id] && imagesMap[item.id].length > 0
+          ? imagesMap[item.id]
           : ['https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&auto=format&fit=crop&q=80'];
 
         return {
@@ -147,18 +174,18 @@ export const productService = {
           price: Number(item.price),
           condition: item.condition,
           brand: item.brand || '',
-          location: item.location || item.city || 'અમદાવાદ',
+          location: item.location || item.city || sellerObj.city || 'અમદાવાદ',
           description: item.description,
           quantity: item.quantity,
-          contactNumber: item.phone_number || item.seller?.phone || '',
-          phone_number: item.phone_number || item.seller?.phone || '',
+          contactNumber: item.phone_number || sellerObj.phone || '',
+          phone_number: item.phone_number || sellerObj.phone || '',
           deliveryOption: item.delivery_option || 'સ્થાનિક પિકઅપ',
           status: item.status || (item.quantity <= 0 ? 'sold' : 'available'),
           sellerId: item.seller_id,
           seller_id: item.seller_id,
-          sellerName: item.seller?.full_name || 'સ્થાનિક ગ્રાહક',
-          sellerAvatar: item.seller?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-          postedDate: new Date(item.created_at).toLocaleDateString('gu-IN', { month: 'short', day: 'numeric' }),
+          sellerName: sellerObj.full_name || item.seller_name || 'સ્થાનિક વેચનાર',
+          sellerAvatar: sellerObj.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+          postedDate: item.created_at ? new Date(item.created_at).toLocaleDateString('gu-IN', { month: 'short', day: 'numeric' }) : 'હમણાં',
           createdAt: item.created_at,
           images: imagesArr
         };
@@ -240,10 +267,7 @@ export const productService = {
           is_active: true,
           status: 'available'
         })
-        .select(`
-          *,
-          seller:profiles(full_name, phone, avatar_url, city)
-        `)
+        .select()
         .single();
 
       if (prodError) {
@@ -276,8 +300,8 @@ export const productService = {
         status: product.status || 'available',
         sellerId: product.seller_id,
         seller_id: product.seller_id,
-        sellerName: product.seller?.full_name || productData.sellerName || 'સ્થાનિક ગ્રાહક',
-        sellerAvatar: product.seller?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        sellerName: productData.sellerName || 'સ્થાનિક વેચનાર',
+        sellerAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
         postedDate: 'હમણાં',
         createdAt: product.created_at,
         images: imageUrls

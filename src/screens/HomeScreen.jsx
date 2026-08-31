@@ -592,6 +592,9 @@ function ProductCard({ prod, onSelect }) {
           </span>
           <span className={`condition-tag ${condClass}`}>{prod.condition}</span>
         </div>
+        <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 4, fontFamily: 'var(--font-guj)', fontWeight: 600 }}>
+          વેચનાર: {prod.sellerName || 'સ્થાનિક વેચનાર'}
+        </div>
       </div>
     </div>
   );
