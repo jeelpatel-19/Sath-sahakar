@@ -1322,3 +1322,413 @@ body {
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
+
+/* ==========================================================================
+   MOBILE FIRST RESPONSIVE SYSTEM (320px - 768px+)
+   ========================================================================== */
+
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Product Detail Grid Layout */
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Fixed Bottom Mobile Navigation Bar */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-color);
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  padding: 0 4px;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-guj);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 8px;
+  min-height: 48px;
+  min-width: 52px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  position: relative;
+  text-decoration: none;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.bottom-nav-sell-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
+  cursor: pointer;
+  margin-top: -18px;
+  transition: var(--transition);
+}
+
+.bottom-nav-sell-btn:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 70px;
+  }
+
+  .desktop-container {
+    padding: 0 12px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .main-content {
+    padding-bottom: 80px;
+  }
+
+  /* Show Bottom Navigation on mobile */
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Mobile Header */
+  .desktop-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-inner {
+    height: 58px;
+  }
+
+  .brand-logo {
+    margin-right: 12px;
+    gap: 8px;
+  }
+
+  .brand-logo-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.05rem;
+  }
+
+  .brand-logo-name {
+    font-size: 1.05rem;
+  }
+
+  .brand-logo-tagline {
+    display: none;
+  }
+
+  .header-search {
+    max-width: 160px;
+    margin-right: 8px;
+  }
+
+  .header-search-input {
+    padding: 8px 12px 8px 34px;
+    font-size: 0.8rem;
+  }
+
+  .header-search-icon {
+    left: 10px;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .btn-sell-nav {
+    display: none;
+  }
+
+  .btn-login-header, .btn-signup-header {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+
+  /* Hero Mobile */
+  .hero-section {
+    padding: 32px 0 0 0;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    padding: 0 14px;
+    gap: 20px;
+    min-height: auto;
+  }
+
+  .hero-h1 {
+    font-size: 1.8rem;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .hero-sub {
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+  }
+
+  .hero-cta-group {
+    gap: 10px;
+  }
+
+  .btn-hero-primary, .btn-hero-secondary {
+    padding: 12px 22px;
+    font-size: 0.88rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-illustration {
+    display: none;
+  }
+
+  /* Benefits Mobile */
+  .benefits-bar {
+    padding: 24px 0;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .benefit-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .benefit-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+
+  .benefit-title {
+    font-size: 0.84rem;
+  }
+
+  .benefit-desc {
+    font-size: 0.74rem;
+  }
+
+  /* Stats Mobile */
+  .stats-section {
+    padding: 36px 0;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-item {
+    padding: 12px 8px;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+  }
+
+  /* Categories Grid Mobile */
+  .categories-grid-6 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .category-card-img {
+    height: 110px;
+  }
+
+  .category-card-body {
+    padding: 12px 14px;
+  }
+
+  .category-card-name {
+    font-size: 0.88rem;
+  }
+
+  .category-card-count {
+    font-size: 0.72rem;
+  }
+
+  .category-card-arrow {
+    font-size: 0.74rem;
+  }
+
+  /* Search Bar Mobile */
+  .big-search-bar {
+    padding: 6px 6px 6px 16px;
+    gap: 10px;
+  }
+
+  .big-search-input {
+    font-size: 0.9rem;
+  }
+
+  .big-search-btn {
+    padding: 10px 18px;
+    font-size: 0.84rem;
+  }
+
+  /* Products Grid Mobile — 2 Columns on Phone Screens */
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .product-card-img-wrapper {
+    height: 145px;
+  }
+
+  .product-card-body {
+    padding: 10px 12px;
+    gap: 5px;
+  }
+
+  .product-card-title {
+    font-size: 0.84rem;
+    line-height: 1.3;
+  }
+
+  .product-card-price {
+    font-size: 1.08rem;
+  }
+
+  .product-card-meta {
+    font-size: 0.7rem;
+    padding-top: 6px;
+  }
+
+  .condition-tag {
+    font-size: 0.66rem;
+    padding: 2px 7px;
+  }
+
+  /* Form & Modals Mobile */
+  .form-card {
+    padding: 20px 16px;
+    margin: 16px 0;
+    border-radius: var(--radius-md);
+    max-width: 100%;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .modal-content {
+    padding: 24px 18px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: var(--radius-md);
+  }
+
+  /* Chat Mobile */
+  .chat-container {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 150px);
+    min-height: 480px;
+    border-radius: var(--radius-md);
+  }
+
+  .chat-sidebar {
+    height: 100%;
+  }
+
+  .chat-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+
+  /* Browse Mobile */
+  .browse-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .filter-panel {
+    position: relative;
+    top: 0;
+  }
+
+  /* Section Headings */
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.78rem;
+  }
+
+  .section-pad {
+    padding: 40px 0;
+  }
+
+  .section-pad-sm {
+    padding: 28px 0;
+  }
+}
+
+/* Extra small phones (<= 350px) */
+@media (max-width: 350px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  .categories-grid-6 {
+    grid-template-columns: 1fr;
+  }
+}

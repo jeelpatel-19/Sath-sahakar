@@ -135,7 +135,7 @@ export default function SellItemPage({ onPublishProduct, currentUser }) {
         </h2>
         <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.65, fontFamily: 'var(--font-guj)' }}>
           તમારી વસ્તુ હવે "અમારી વસ્તુ" માં ઉપલબ્ધ છે.<br />
-          ખરીદનારા ટૂંક સમયમાં સંપર્ક કરશે.
+          ખરીદનારા ટૂંક સમયમાં કૉલ અથવા ચેટ કરશે.
         </p>
       </div>
     );
@@ -343,7 +343,7 @@ export default function SellItemPage({ onPublishProduct, currentUser }) {
               <div className="form-group">
                 <label className="form-label">મોબાઇલ નંબર (૧૦ અંક) *</label>
                 <input
-                  type="text"
+                  type="tel"
                   className="form-input"
                   placeholder="૯૮૭૬૫૪૩૨૧૦"
                   value={contactNumber}

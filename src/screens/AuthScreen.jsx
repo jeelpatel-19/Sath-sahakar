@@ -17,6 +17,12 @@ export default function AuthScreen({ onAuthSuccess }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Phone number change handler: digits only, max 10 digits
+  const handlePhoneChange = (e) => {
+    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digitsOnly);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
@@ -39,6 +45,9 @@ export default function AuthScreen({ onAuthSuccess }) {
       } else if (mode === 'signup') {
         if (!name || !email || !password || !phone) {
           throw new Error('કૃપા કરીને બધી જરૂરી માહિતી ભરો.');
+        }
+        if (phone.length !== 10) {
+          throw new Error('મોબાઇલ નંબર બરાબર 10 અંકનો હોવો જોઈએ.');
         }
         if (password.length < 6) {
           throw new Error('પાસવર્ડ ઓછામાં ઓછો 6 અક્ષરનો હોવો જોઈએ.');
@@ -202,16 +211,22 @@ export default function AuthScreen({ onAuthSuccess }) {
             <div className="form-group">
               <label className="form-label">
                 <Phone size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />
-                મોબાઇલ નંબર *
+                મોબાઇલ નંબર (૧૦ અંક) *
               </label>
               <input
                 type="tel"
                 className="form-input"
-                placeholder="+91 98765 43210"
+                placeholder="૯૮૭૬૫૪૩૨૧૦"
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
+                maxLength={10}
                 required
               />
+              {phone && phone.length !== 10 && (
+                <span style={{ fontSize: '0.75rem', color: '#dc2626', marginTop: 4, display: 'block', fontFamily: 'var(--font-guj)' }}>
+                  બરાબર ૧૦ અંક હોવા જોઈએ (હમણાં: {phone.length})
+                </span>
+              )}
             </div>
           )}
 

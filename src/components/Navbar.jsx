@@ -1,48 +1,52 @@
 import React from 'react';
-import { Home, LayoutGrid, Plus, MessageSquare, User } from 'lucide-react';
+import { Home, ShoppingBag, Plus, Package, User } from 'lucide-react';
 
-export default function Navbar({ currentTab, setCurrentTab, unreadChatsCount, onOpenSellModal }) {
+export default function Navbar({ currentTab, setCurrentTab }) {
   return (
     <nav className="bottom-nav">
       <button 
-        className={`nav-item ${currentTab === 'home' ? 'active' : ''}`}
+        className={`bottom-nav-item ${currentTab === 'home' ? 'active' : ''}`}
         onClick={() => setCurrentTab('home')}
+        id="mobile-nav-home"
       >
-        <Home size={21} />
-        <span>Home</span>
+        <Home size={20} />
+        <span>હોમ</span>
       </button>
 
       <button 
-        className={`nav-item ${currentTab === 'categories' ? 'active' : ''}`}
+        className={`bottom-nav-item ${currentTab === 'categories' ? 'active' : ''}`}
         onClick={() => setCurrentTab('categories')}
+        id="mobile-nav-categories"
       >
-        <LayoutGrid size={21} />
-        <span>Categories</span>
+        <ShoppingBag size={20} />
+        <span>અમારી વસ્તુ</span>
       </button>
 
       <button 
-        className="nav-sell-btn"
-        onClick={onOpenSellModal}
-        title="Sell Product"
+        className="bottom-nav-sell-btn"
+        onClick={() => setCurrentTab('sell')}
+        title="વેચાણ કરો"
+        id="mobile-nav-sell"
       >
-        <Plus size={28} strokeWidth={2.8} />
+        <Plus size={26} strokeWidth={2.8} />
       </button>
 
       <button 
-        className={`nav-item ${currentTab === 'messages' ? 'active' : ''}`}
-        onClick={() => setCurrentTab('messages')}
+        className={`bottom-nav-item ${currentTab === 'listings' ? 'active' : ''}`}
+        onClick={() => setCurrentTab('listings')}
+        id="mobile-nav-listings"
       >
-        <MessageSquare size={21} />
-        <span>Messages</span>
-        {unreadChatsCount > 0 && <span className="unread-badge">{unreadChatsCount}</span>}
+        <Package size={20} />
+        <span>મારી વસ્તુઓ</span>
       </button>
 
       <button 
-        className={`nav-item ${currentTab === 'profile' ? 'active' : ''}`}
+        className={`bottom-nav-item ${currentTab === 'profile' ? 'active' : ''}`}
         onClick={() => setCurrentTab('profile')}
+        id="mobile-nav-profile"
       >
-        <User size={21} />
-        <span>Profile</span>
+        <User size={20} />
+        <span>પ્રોફાઇલ</span>
       </button>
     </nav>
   );

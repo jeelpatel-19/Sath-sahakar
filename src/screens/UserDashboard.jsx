@@ -87,6 +87,43 @@ export default function UserDashboard({
     }
   };
 
+  const handleOpenEdit = (prod) => {
+    setEditingProduct(prod);
+    setEditTitle(prod.title || '');
+    setEditPrice(prod.price || '');
+    setEditCategory(prod.category || 'ઇલેક્ટ્રોનિક્સ');
+    setEditCondition(prod.condition || 'સારી સ્થિતિ');
+    setEditDescription(prod.description || '');
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    setProducts(prev => prev.map(p => p.id === editingProduct.id ? {
+      ...p,
+      title: editTitle,
+      price: Number(editPrice),
+      category: editCategory,
+      condition: editCondition,
+      description: editDescription
+    } : p));
+    setEditingProduct(null);
+  };
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    if (setCurrentUser && currentUser) {
+      setCurrentUser({
+        ...currentUser,
+        name: profileName,
+        phone: profilePhone,
+        location: profileLocation
+      });
+    }
+    setSavedSettingsMsg(true);
+    setTimeout(() => setSavedSettingsMsg(false), 3000);
+  };
+
   const TABS = [
     { key: 'listings', icon: <Package size={16} />, label: `મારી વસ્તુઓ (${myProducts.length})` },
     { key: 'buyer-orders', icon: <ShoppingCart size={16} />, label: `મારા ઓર્ડર (${buyerOrders.length})` },

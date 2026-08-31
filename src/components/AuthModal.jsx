@@ -13,11 +13,21 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
 
   if (!isOpen) return null;
 
+  const handlePhoneChange = (e) => {
+    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digitsOnly);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (mode === 'forgot') {
       setForgotSent(true);
+      return;
+    }
+
+    if (mode === 'signup' && phone && phone.length !== 10) {
+      alert('મોબાઇલ નંબર બરાબર 10 અંકનો હોવો જોઈએ.');
       return;
     }
 
@@ -27,7 +37,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         id: `usr-${Date.now()}`,
         name: name || (email ? email.split('@')[0] : 'ગ્રાહક'),
         email: email || 'user@example.com',
-        phone: phone || '+91 98765 43210',
+        phone: phone || '9876543210',
         location: location || 'ગુજરાત',
         avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
       });
@@ -175,17 +185,23 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
                   <div className="form-group">
                     <label className="form-label">
                       <Phone size={14} style={{ verticalAlign: 'middle', marginRight: 5 }} />
-                      મોબાઇલ નંબર *
+                      મોબાઇલ નંબર (૧૦ અંક) *
                     </label>
                     <input
                       type="tel"
                       className="form-input"
-                      placeholder="+91 98765 43210"
+                      placeholder="૯૮૭૬૫૪૩૨૧૦"
                       value={phone}
-                      onChange={e => setPhone(e.target.value)}
+                      onChange={handlePhoneChange}
+                      maxLength={10}
                       required
                       id="auth-phone"
                     />
+                    {phone && phone.length !== 10 && (
+                      <span style={{ fontSize: '0.75rem', color: '#dc2626', marginTop: 4, display: 'block', fontFamily: 'var(--font-guj)' }}>
+                        બરાબર ૧૦ અંક હોવા જોઈએ (હમણાં: {phone.length})
+                      </span>
+                    )}
                   </div>
                 )}
 

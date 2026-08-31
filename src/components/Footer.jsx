@@ -125,7 +125,7 @@ export default function Footer({ setCurrentTab }) {
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 14 }}>
                 <ShieldCheck size={20} color="#4ade80" style={{ flexShrink: 0, marginTop: 2 }} />
                 <p style={{ fontSize: '0.84rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, fontFamily: 'var(--font-guj)' }}>
-                  હંમેશા વેચનાર સાથે સીધો સંપર્ક કરો. જાહેર સ્થળ પર વ્યવહાર કરો.
+                  હંમેશા વેચનાર સાથે સીધી વાતચીત કરો. જાહેર સ્થળ પર વ્યવહાર કરો.
                 </p>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>

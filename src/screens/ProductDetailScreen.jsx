@@ -51,8 +51,8 @@ export default function ProductDetailScreen({
         <ArrowLeft size={16} /> પાછળ
       </button>
 
-      {/* 2-Column Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 36, alignItems: 'start' }}>
+      {/* 2-Column Responsive Layout */}
+      <div className="product-detail-grid">
 
         {/* Left: Gallery + Description */}
         <div>
@@ -246,20 +246,20 @@ export default function ProductDetailScreen({
               </button>
 
               {/* Call Seller */}
-              <button
+              <a
+                href={`tel:${product.contactNumber || product.phone_number || product.phone || ''}`}
                 id="btn-call-seller"
-                onClick={() => setShowContactModal(true)}
                 style={{
                   width: '100%', padding: '13px 24px',
                   background: 'var(--primary-light)', color: 'var(--primary)',
                   border: '1.5px solid rgba(22,163,74,0.3)', borderRadius: 'var(--radius-sm)',
                   fontSize: '0.96rem', fontWeight: 800, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-                  fontFamily: 'var(--font-guj)', transition: 'var(--transition)'
+                  fontFamily: 'var(--font-guj)', transition: 'var(--transition)', textDecoration: 'none'
                 }}
               >
                 <PhoneCall size={18} /> વેચનારને કૉલ કરો
-              </button>
+              </a>
 
               {/* Save & Share */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

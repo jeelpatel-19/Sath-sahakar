@@ -1,6 +1,7 @@
 // TEST
 import React, { useState, useEffect } from 'react';
 import DesktopHeader from './components/DesktopHeader';
+import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 
@@ -345,6 +346,9 @@ export default function App() {
         onClose={() => setShowAuthModal(false)}
         onAuthSuccess={handleAuthSuccess}
       />
+
+      {/* Mobile Bottom Navbar */}
+      <Navbar currentTab={currentTab} setCurrentTab={setCurrentTab} />
 
       {/* Footer */}
       <Footer setCurrentTab={setCurrentTab} />
