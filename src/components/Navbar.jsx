@@ -4,7 +4,7 @@ import { Home, ShoppingBag, Plus, Package, User } from 'lucide-react';
 export default function Navbar({ currentTab, setCurrentTab }) {
   return (
     <nav className="bottom-nav">
-      <button 
+      <button
         className={`bottom-nav-item ${currentTab === 'home' ? 'active' : ''}`}
         onClick={() => setCurrentTab('home')}
         id="mobile-nav-home"
@@ -13,7 +13,7 @@ export default function Navbar({ currentTab, setCurrentTab }) {
         <span>હોમ</span>
       </button>
 
-      <button 
+      <button
         className={`bottom-nav-item ${currentTab === 'categories' ? 'active' : ''}`}
         onClick={() => setCurrentTab('categories')}
         id="mobile-nav-categories"
@@ -22,7 +22,7 @@ export default function Navbar({ currentTab, setCurrentTab }) {
         <span>અમારી વસ્તુ</span>
       </button>
 
-      <button 
+      <button
         className="bottom-nav-sell-btn"
         onClick={() => setCurrentTab('sell')}
         title="વેચાણ કરો"
@@ -31,7 +31,7 @@ export default function Navbar({ currentTab, setCurrentTab }) {
         <Plus size={26} strokeWidth={2.8} />
       </button>
 
-      <button 
+      <button
         className={`bottom-nav-item ${currentTab === 'listings' ? 'active' : ''}`}
         onClick={() => setCurrentTab('listings')}
         id="mobile-nav-listings"
@@ -40,7 +40,7 @@ export default function Navbar({ currentTab, setCurrentTab }) {
         <span>મારી વસ્તુઓ</span>
       </button>
 
-      <button 
+      <button
         className={`bottom-nav-item ${currentTab === 'profile' ? 'active' : ''}`}
         onClick={() => setCurrentTab('profile')}
         id="mobile-nav-profile"
