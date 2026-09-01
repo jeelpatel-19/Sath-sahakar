@@ -7,7 +7,7 @@ import { CATEGORIES } from '../data/mockData';
 
 const ICON_MAP = { Tv, Armchair, BookOpen, Home, Utensils, Shirt };
 
-export default function CategoriesScreen({ products, onSelectCategory, onSelectProduct }) {
+export default function CategoriesScreen({ products, onSelectCategory, onSelectProduct, onSelectSeller }) {
   const [activeCat, setActiveCat] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCondition, setSelectedCondition] = useState('all');
@@ -225,7 +225,7 @@ export default function CategoriesScreen({ products, onSelectCategory, onSelectP
           ) : (
             <div className="products-grid">
               {filteredProducts.map(prod => (
-                <BrowseProductCard key={prod.id} prod={prod} onSelect={() => onSelectProduct(prod)} />
+                <BrowseProductCard key={prod.id} prod={prod} onSelect={() => onSelectProduct(prod)} onSelectSeller={onSelectSeller} />
               ))}
             </div>
           )}
@@ -235,7 +235,7 @@ export default function CategoriesScreen({ products, onSelectCategory, onSelectP
   );
 }
 
-function BrowseProductCard({ prod, onSelect }) {
+function BrowseProductCard({ prod, onSelect, onSelectSeller }) {
   const [saved, setSaved] = useState(false);
   return (
     <div className="product-card" onClick={onSelect} id={`browse-prod-${prod.id}`}>
@@ -264,8 +264,21 @@ function BrowseProductCard({ prod, onSelect }) {
           </span>
           <span className="condition-tag">{prod.condition}</span>
         </div>
-        <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: 4, fontFamily: 'var(--font-guj)', fontWeight: 600 }}>
-          વેચનાર: {prod.sellerName || 'સ્થાનિક વેચનાર'}
+        <div
+          onClick={(e) => {
+            if (onSelectSeller && (prod.sellerId || prod.seller_id)) {
+              e.stopPropagation();
+              onSelectSeller(prod.sellerId || prod.seller_id);
+            }
+          }}
+          style={{
+            fontSize: '0.75rem', color: 'var(--primary)', marginTop: 4,
+            fontFamily: 'var(--font-guj)', fontWeight: 700, cursor: 'pointer',
+            display: 'inline-block'
+          }}
+          title="વેચનાર પ્રોફાઇલ જુઓ"
+        >
+          વેચનાર: {prod.sellerName || 'સ્થાનિક વેચનાર'} 👤
         </div>
       </div>
     </div>

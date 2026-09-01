@@ -365,5 +365,45 @@ export const productService = {
       console.error('Delete product error:', err);
       return { success: false, error: err.message };
     }
+  },
+
+  // Fetch only ACTIVE products by a specific seller
+  async getProductsBySeller(sellerId) {
+    const { products, error } = await this.getProducts({ sellerId });
+    if (error) return { products: [], error };
+    const activeProducts = (products || []).filter(p => p.status === 'available' || p.status !== 'sold');
+    return { products: activeProducts, error: null };
+  },
+
+  // Get Seller Public Profile by sellerId
+  async getSellerProfile(sellerId) {
+    if (!isSupabaseConfigured()) {
+      const savedStr = localStorage.getItem('sathsarkaar_products');
+      const prods = savedStr ? JSON.parse(savedStr) : [...INITIAL_PRODUCTS];
+      const sellerProd = prods.find(p => p.sellerId === sellerId || p.seller_id === sellerId);
+      return {
+        profile: {
+          id: sellerId,
+          full_name: sellerProd?.sellerName || 'સ્થાનિક વેચનાર',
+          avatar_url: sellerProd?.sellerAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+          city: sellerProd?.location || sellerProd?.city || 'અમદાવાદ'
+        },
+        error: null
+      };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, phone, avatar_url, city, area')
+        .eq('id', sellerId)
+        .single();
+
+      if (error) throw error;
+      return { profile: data, error: null };
+    } catch (err) {
+      console.error('Get seller profile error:', err);
+      return { profile: null, error: err.message };
+    }
   }
 };

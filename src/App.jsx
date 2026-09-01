@@ -13,6 +13,8 @@ import ProductDetailScreen from './screens/ProductDetailScreen';
 import UserDashboard from './screens/UserDashboard';
 import AdminDashboard from './screens/AdminDashboard';
 import ChatSystem from './screens/ChatSystem';
+import SellerProfileScreen from './screens/SellerProfileScreen';
+import AboutScreen from './screens/AboutScreen';
 
 import { authService } from './services/authService';
 import { productService } from './services/productService';
@@ -22,9 +24,10 @@ import { chatService } from './services/chatService';
 import { INITIAL_PRODUCTS, INITIAL_USER_PROFILE } from './data/mockData';
 
 export default function App() {
-  // Navigation State: 'home' | 'categories' | 'sell' | 'listings' | 'messages' | 'profile' | 'productDetail' | 'admin'
+  // Navigation State: 'home' | 'categories' | 'sell' | 'listings' | 'messages' | 'profile' | 'productDetail' | 'sellerProfile' | 'admin'
   const [currentTab, setCurrentTab] = useState('home');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedSellerId, setSelectedSellerId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Authentication State
@@ -122,6 +125,12 @@ export default function App() {
   const handleSelectProduct = (prod) => {
     setSelectedProduct(prod);
     setCurrentTab('productDetail');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectSeller = (sellerId) => {
+    setSelectedSellerId(sellerId);
+    setCurrentTab('sellerProfile');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -253,6 +262,7 @@ export default function App() {
           }}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          onSelectSeller={handleSelectSeller}
         />
       )}
 
@@ -261,6 +271,7 @@ export default function App() {
           products={products}
           onSelectCategory={(catName) => console.log(catName)}
           onSelectProduct={handleSelectProduct}
+          onSelectSeller={handleSelectSeller}
         />
       )}
 
@@ -329,6 +340,25 @@ export default function App() {
           onStartChat={handleStartChatWithSeller}
           currentUser={currentUser}
           onOrderSuccess={handleOrderSuccess}
+          onSelectSeller={handleSelectSeller}
+        />
+      )}
+
+      {currentTab === 'sellerProfile' && (
+        <SellerProfileScreen
+          sellerId={selectedSellerId}
+          products={products}
+          onSelectProduct={handleSelectProduct}
+          onBack={() => setCurrentTab('home')}
+          savedProductIds={savedProductIds}
+          onToggleSaveProduct={handleToggleSaveProduct}
+        />
+      )}
+
+      {currentTab === 'about' && (
+        <AboutScreen
+          onNavigateSell={() => setCurrentTab('sell')}
+          onNavigateHome={() => setCurrentTab('home')}
         />
       )}
 

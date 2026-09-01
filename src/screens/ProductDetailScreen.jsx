@@ -12,7 +12,8 @@ export default function ProductDetailScreen({
   onToggleSave,
   onStartChat,
   currentUser,
-  onOrderSuccess
+  onOrderSuccess,
+  onSelectSeller
 }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showContactModal, setShowContactModal] = useState(false);
@@ -192,12 +193,28 @@ export default function ProductDetailScreen({
           </div>
 
           {/* Seller Box */}
-          <div style={{
-            background: 'var(--bg-page)', border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-sm)', padding: 16, marginBottom: 22
-          }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8, letterSpacing: '0.4px', fontFamily: 'var(--font-guj)' }}>
-              વેચનારની માહિતી
+          <div
+            id="seller-info-box"
+            onClick={() => {
+              if (onSelectSeller && (product.sellerId || product.seller_id)) {
+                onSelectSeller(product.sellerId || product.seller_id);
+              }
+            }}
+            style={{
+              background: 'var(--bg-page)', border: '1.5px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)', padding: 16, marginBottom: 22,
+              cursor: 'pointer', transition: 'var(--transition)'
+            }}
+            onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--primary)'; }}
+            onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.4px', fontFamily: 'var(--font-guj)' }}>
+                વેચનારની માહિતી
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 800, fontFamily: 'var(--font-guj)' }}>
+                પ્રોફાઇલ / સ્ટોર જુઓ →
+              </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'var(--font-guj)' }}>

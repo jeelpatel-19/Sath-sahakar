@@ -5,8 +5,9 @@ export const authService = {
   async signUp({ email, password, fullName, phone, city = 'અમદાવાદ', area = '', avatarUrl = '' }) {
     if (!isSupabaseConfigured()) {
       // Offline / Local dev fallback
+      const userSlug = email ? email.toLowerCase().replace(/[^a-z0-9]/g, '') : `${Date.now()}`;
       const mockUser = {
-        id: `usr-${Date.now()}`,
+        id: `usr-${userSlug}`,
         email,
         name: fullName || email.split('@')[0],
         phone: phone || '+91 98765 43210',
@@ -61,8 +62,9 @@ export const authService = {
   // Log in existing user
   async signIn({ email, password }) {
     if (!isSupabaseConfigured()) {
+      const userSlug = email ? email.toLowerCase().replace(/[^a-z0-9]/g, '') : 'demo1';
       const mockUser = {
-        id: `usr-demo-1`,
+        id: `usr-${userSlug}`,
         email,
         name: email.split('@')[0],
         phone: '+91 98765 43210',

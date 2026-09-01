@@ -7,6 +7,7 @@ import { CATEGORIES } from '../data/mockData';
 import ChatSystem from './ChatSystem';
 import { orderService } from '../services/orderService';
 import { productService } from '../services/productService';
+import { authService } from '../services/authService';
 
 export default function UserDashboard({
   products,
@@ -55,8 +56,26 @@ export default function UserDashboard({
     }
   }, [currentUser?.id, dashboardTab]);
 
-  const myProducts = products.filter(p =>
-    p.sellerId === currentUser?.id || p.seller_id === currentUser?.id
+  const [myDbProducts, setMyDbProducts] = useState([]);
+
+  // Load real user listings explicitly from Supabase using currentUser.id
+  useEffect(() => {
+    let isMounted = true;
+    async function loadUserProducts() {
+      if (!currentUser?.id) return;
+      const { products: fetchedProducts } = await productService.getProducts({ sellerId: currentUser.id });
+      if (isMounted && fetchedProducts) {
+        setMyDbProducts(fetchedProducts);
+      }
+    }
+    loadUserProducts();
+    return () => { isMounted = false; };
+  }, [currentUser?.id, products]);
+
+  // myProducts comes directly from query matching currentUser.id (never containing other users' items)
+  const sourceProducts = myDbProducts.length > 0 ? myDbProducts : products;
+  const myProducts = sourceProducts.filter(p =>
+    Boolean(currentUser?.id) && (String(p.sellerId) === String(currentUser.id) || String(p.seller_id) === String(currentUser.id))
   );
 
   const soldProducts = myProducts.filter(p => p.status === 'sold');
@@ -110,15 +129,25 @@ export default function UserDashboard({
     setEditingProduct(null);
   };
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (setCurrentUser && currentUser) {
-      setCurrentUser({
+      const updatedUser = {
         ...currentUser,
         name: profileName,
+        full_name: profileName,
         phone: profilePhone,
-        location: profileLocation
-      });
+        location: profileLocation,
+        city: profileLocation
+      };
+      setCurrentUser(updatedUser);
+      if (currentUser.id) {
+        await authService.updateProfile(currentUser.id, {
+          name: profileName,
+          phone: profilePhone,
+          city: profileLocation
+        });
+      }
     }
     setSavedSettingsMsg(true);
     setTimeout(() => setSavedSettingsMsg(false), 3000);
