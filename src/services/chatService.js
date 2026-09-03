@@ -4,29 +4,42 @@ export const chatService = {
   // Get or Create Conversation between Buyer and Seller for a Product
   async getOrCreateConversation({ productId, buyerId, sellerId }) {
     if (!isSupabaseConfigured()) {
-      return {
-        conversation: {
-          id: `chat-${productId}-${buyerId}`,
+      const saved = JSON.parse(localStorage.getItem('sathsarkaar_chats') || '[]');
+      let existing = saved.find(c => (c.productId === productId || c.product_id === productId) && c.buyerId === buyerId && c.sellerId === sellerId);
+      let isNew = false;
+
+      if (!existing) {
+        isNew = true;
+        existing = {
+          id: `chat-${productId}-${buyerId}-${Date.now()}`,
           productId,
           buyerId,
-          sellerId
-        },
-        error: null
-      };
+          sellerId,
+          messages: [],
+          updated_at: new Date().toISOString()
+        };
+        saved.push(existing);
+        localStorage.setItem('sathsarkaar_chats', JSON.stringify(saved));
+      } else {
+        isNew = !existing.messages || existing.messages.length === 0;
+      }
+
+      return { conversation: existing, isNew, error: null };
     }
 
     try {
       // 1. Check existing conversation
       const { data: existing, error: findError } = await supabase
         .from('conversations')
-        .select('*')
+        .select('*, messages(id)')
         .eq('product_id', productId)
         .eq('buyer_id', buyerId)
         .eq('seller_id', sellerId)
         .maybeSingle();
 
       if (existing) {
-        return { conversation: existing, error: null };
+        const hasMessages = existing.messages && existing.messages.length > 0;
+        return { conversation: existing, isNew: !hasMessages, error: null };
       }
 
       // 2. Create new conversation
@@ -41,18 +54,65 @@ export const chatService = {
         .single();
 
       if (createError) throw createError;
-      return { conversation: newConv, error: null };
+      return { conversation: newConv, isNew: true, error: null };
     } catch (err) {
       console.error('Get/Create conversation error:', err);
-      return { conversation: null, error: err.message };
+      return { conversation: null, isNew: false, error: err.message };
     }
   },
 
   // Fetch all conversations for a user
   async getUserConversations(userId) {
+    if (!userId) return { conversations: [], error: null };
+
     if (!isSupabaseConfigured()) {
       const saved = JSON.parse(localStorage.getItem('sathsarkaar_chats') || '[]');
-      return { conversations: saved, error: null };
+      const userConvs = saved.filter(c => c.buyerId === userId || c.sellerId === userId);
+
+      const savedProds = JSON.parse(localStorage.getItem('sathsarkaar_products') || '[]');
+
+      const formatted = userConvs.map(conv => {
+        const sortedMsgs = (conv.messages || []).sort((a, b) => new Date(a.created_at || a.time || 0) - new Date(b.created_at || b.time || 0));
+        const lastMsg = sortedMsgs[sortedMsgs.length - 1];
+        const isBuyer = conv.buyerId === userId;
+
+        const prod = savedProds.find(p => p.id === conv.productId) || {
+          title: conv.productTitle || 'વસ્તુ',
+          price: conv.productPrice || 0,
+          images: [conv.productImage]
+        };
+        const prodImg = prod.images?.[0] || conv.productImage || 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80';
+
+        const unread = sortedMsgs.filter(m => (m.sender_id || m.senderId) !== userId && !m.is_read).length;
+
+        // Formulate readable name for participant
+        const otherName = conv.otherPersonName || (isBuyer ? (prod.sellerName || 'વેચનાર') : (conv.buyerName || 'ગ્રાહક'));
+
+        return {
+          id: conv.id,
+          productId: conv.productId || conv.product_id,
+          buyerId: conv.buyerId || conv.buyer_id,
+          sellerId: conv.sellerId || conv.seller_id,
+          productTitle: prod.title || conv.productTitle || 'વસ્તુ',
+          productPrice: prod.price || conv.productPrice || 0,
+          productImage: prodImg,
+          otherPersonName: otherName,
+          sellerName: otherName,
+          otherPersonAvatar: conv.otherPersonAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+          unreadCount: unread,
+          lastMessage: lastMsg?.text || 'ચેટ શરૂ કરો...',
+          lastMessageTime: lastMsg ? (lastMsg.time || new Date(lastMsg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) : '',
+          messages: sortedMsgs.map(m => ({
+            id: m.id,
+            sender: (m.sender_id || m.senderId) === userId ? 'user' : 'other',
+            senderId: m.sender_id || m.senderId,
+            text: m.text,
+            time: m.time || (m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')
+          }))
+        };
+      });
+
+      return { conversations: formatted, error: null };
     }
 
     try {
@@ -77,14 +137,18 @@ export const chatService = {
         const unread = sortedMsgs.filter(m => m.sender_id !== userId && !m.is_read).length;
 
         const prodImg = conv.product?.product_images?.[0]?.image_url || 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80';
+        const otherName = otherPerson?.full_name || 'ગ્રાહક';
 
         return {
           id: conv.id,
           productId: conv.product_id,
+          buyerId: conv.buyer_id,
+          sellerId: conv.seller_id,
           productTitle: conv.product?.title || 'વસ્તુ',
           productPrice: conv.product?.price || 0,
           productImage: prodImg,
-          otherPersonName: otherPerson?.full_name || 'ગ્રાહક',
+          otherPersonName: otherName,
+          sellerName: otherName,
           otherPersonAvatar: otherPerson?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
           unreadCount: unread,
           lastMessage: lastMsg?.text || 'ચેટ શરૂ કરો...',
@@ -92,6 +156,7 @@ export const chatService = {
           messages: sortedMsgs.map(m => ({
             id: m.id,
             sender: m.sender_id === userId ? 'user' : 'other',
+            senderId: m.sender_id,
             text: m.text,
             time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }))
@@ -108,12 +173,27 @@ export const chatService = {
   // Send Message
   async sendMessage({ conversationId, senderId, receiverId, text }) {
     if (!isSupabaseConfigured()) {
+      const saved = JSON.parse(localStorage.getItem('sathsarkaar_chats') || '[]');
+      const convIndex = saved.findIndex(c => c.id === conversationId);
       const newMsg = {
         id: `msg-${Date.now()}`,
-        sender: 'user',
+        sender_id: senderId,
+        receiver_id: receiverId,
+        senderId: senderId,
+        receiverId: receiverId,
         text,
+        is_read: false,
+        created_at: new Date().toISOString(),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
+
+      if (convIndex !== -1) {
+        if (!saved[convIndex].messages) saved[convIndex].messages = [];
+        saved[convIndex].messages.push(newMsg);
+        saved[convIndex].updated_at = new Date().toISOString();
+        localStorage.setItem('sathsarkaar_chats', JSON.stringify(saved));
+      }
+
       return { message: newMsg, error: null };
     }
 
@@ -139,13 +219,15 @@ export const chatService = {
         .eq('id', conversationId);
 
       // Create Notification for receiver
-      await supabase.from('notifications').insert({
-        user_id: receiverId,
-        title: 'નવો સંદેશ મળ્યો',
-        message: text.substring(0, 40) + '...',
-        type: 'chat',
-        link: `/messages`
-      });
+      if (receiverId) {
+        await supabase.from('notifications').insert({
+          user_id: receiverId,
+          title: 'નવો સંદેશ મળ્યો',
+          message: text.substring(0, 40) + '...',
+          type: 'chat',
+          link: `/messages`
+        });
+      }
 
       return { message: msg, error: null };
     } catch (err) {
@@ -179,3 +261,4 @@ export const chatService = {
     };
   }
 };
+

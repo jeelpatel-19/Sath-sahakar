@@ -99,9 +99,13 @@ export default function App() {
 
         // Fetch Conversations
         const { conversations } = await chatService.getUserConversations(currentUser.id);
-        if (conversations && conversations.length > 0) {
+        if (conversations) {
           setChats(conversations);
-          setActiveChatId(conversations[0].id);
+          if (conversations.length > 0) {
+            setActiveChatId(prev => (prev && conversations.some(c => c.id === prev) ? prev : conversations[0].id));
+          } else {
+            setActiveChatId(null);
+          }
         }
       }
     }
@@ -180,40 +184,44 @@ export default function App() {
       return;
     }
 
-    let existingChat = chats.find(c => c.productId === prod.id || c.productTitle === prod.title);
+    const sellerId = prod.seller_id || prod.sellerId;
 
-    if (!existingChat) {
-      // Create conversation in database
-      const { conversation } = await chatService.getOrCreateConversation({
-        productId: prod.id,
-        buyerId: currentUser.id,
-        sellerId: prod.sellerId || 'usr-seller-demo'
-      });
-
-      existingChat = {
-        id: conversation?.id || `chat-${Date.now()}`,
-        productId: prod.id,
-        productTitle: prod.title,
-        productPrice: prod.price,
-        productImage: prod.images?.[0],
-        otherPersonName: prod.sellerName || 'ગ્રાહક',
-        unreadCount: 0,
-        lastMessage: `${prod.title} હજુ ઉપલબ્ધ છે?`,
-        lastMessageTime: 'હમણાં',
-        messages: [
-          {
-            id: `m-init-${Date.now()}`,
-            sender: 'user',
-            text: `નમસ્તે ${prod.sellerName || 'ભાઈ/બહેન'}, "${prod.title}" હજુ ઉપલબ્ધ છે?`,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }
-        ]
-      };
-
-      setChats([existingChat, ...chats]);
+    // Do not allow chatting with self
+    if (sellerId && sellerId === currentUser.id) {
+      return;
     }
 
-    setActiveChatId(existingChat.id);
+    const { conversation, isNew } = await chatService.getOrCreateConversation({
+      productId: prod.id,
+      buyerId: currentUser.id,
+      sellerId: sellerId || 'usr-seller-default'
+    });
+
+    if (conversation) {
+      // If newly created conversation or no messages exist yet, send automatic interest message
+      if (isNew) {
+        const itemTitle = prod.title ? prod.title : 'આ વસ્તુ';
+        const initText = `મને ${itemTitle} ખરીદવામાં રસ છે.`;
+        const { error: sendErr } = await chatService.sendMessage({
+          conversationId: conversation.id,
+          senderId: currentUser.id,
+          receiverId: sellerId || currentUser.id,
+          text: initText
+        });
+        if (sendErr) {
+          console.error('Failed to send interest message:', sendErr);
+          alert(`સંદેશ મોકલવામાં ક્ષતિ આવી: ${sendErr}`);
+        }
+      }
+
+      // Re-fetch conversations for current user
+      const { conversations } = await chatService.getUserConversations(currentUser.id);
+      if (conversations) {
+        setChats(conversations);
+      }
+      setActiveChatId(conversation.id);
+    }
+
     setCurrentTab('messages');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

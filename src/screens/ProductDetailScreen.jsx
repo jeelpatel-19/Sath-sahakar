@@ -31,6 +31,7 @@ export default function ProductDetailScreen({
   };
 
   const isSold = product.status === 'sold' || (product.quantity !== undefined && product.quantity <= 0);
+  const isSeller = Boolean(currentUser?.id && (currentUser.id === product.sellerId || currentUser.id === product.seller_id));
 
   return (
     <div className="desktop-container main-content" style={{ paddingTop: 36 }}>
@@ -247,20 +248,22 @@ export default function ProductDetailScreen({
               </button>
 
               {/* Chat Seller */}
-              <button
-                id="btn-message-seller"
-                onClick={() => onStartChat(product)}
-                style={{
-                  width: '100%', padding: '13px 24px',
-                  background: '#ffffff', color: 'var(--primary)',
-                  border: '1.5px solid var(--primary)', borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.96rem', fontWeight: 800, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-                  fontFamily: 'var(--font-guj)', transition: 'var(--transition)'
-                }}
-              >
-                <MessageSquare size={18} /> વેચનાર સાથે ચેટ કરો
-              </button>
+              {!isSeller && (
+                <button
+                  id="btn-message-seller"
+                  onClick={() => onStartChat(product)}
+                  style={{
+                    width: '100%', padding: '13px 24px',
+                    background: '#ffffff', color: 'var(--primary)',
+                    border: '1.5px solid var(--primary)', borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.96rem', fontWeight: 800, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+                    fontFamily: 'var(--font-guj)', transition: 'var(--transition)'
+                  }}
+                >
+                  <MessageSquare size={18} /> વેચનાર સાથે ચેટ કરો
+                </button>
+              )}
 
               {/* Call Seller */}
               <a

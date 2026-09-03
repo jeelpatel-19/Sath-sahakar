@@ -220,6 +220,35 @@ export default function SellItemPage({ onPublishProduct, currentUser }) {
                 <input type="file" accept="image/*" multiple onChange={handleFileUpload} style={{ display: 'none' }} />
               </label>
             </div>
+
+            {/* Quick preset sample photos */}
+            <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-guj)' }}>અથવા સેમ્પલ ફોટો પસંદ કરો:</span>
+              <button
+                type="button"
+                id="btn-preset-img-1"
+                onClick={() => handleAddPresetPhoto('https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80')}
+                style={{ fontSize: '0.73rem', background: '#f3f4f6', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-full)', padding: '4px 10px', cursor: 'pointer', fontFamily: 'var(--font-guj)' }}
+              >
+                💻 લેપટોપ
+              </button>
+              <button
+                type="button"
+                id="btn-preset-img-2"
+                onClick={() => handleAddPresetPhoto('https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80')}
+                style={{ fontSize: '0.73rem', background: '#f3f4f6', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-full)', padding: '4px 10px', cursor: 'pointer', fontFamily: 'var(--font-guj)' }}
+              >
+                📱 મોબાઈલ
+              </button>
+              <button
+                type="button"
+                id="btn-preset-img-3"
+                onClick={() => handleAddPresetPhoto('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&auto=format&fit=crop&q=80')}
+                style={{ fontSize: '0.73rem', background: '#f3f4f6', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-full)', padding: '4px 10px', cursor: 'pointer', fontFamily: 'var(--font-guj)' }}
+              >
+                🛋️ સોફા / ફર્નિચર
+              </button>
+            </div>
           </div>
 
           {/* Product Title */}

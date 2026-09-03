@@ -286,6 +286,24 @@ function ProductCard({ prod, onSelect, onSelectSeller }) {
         >
           વેચનાર: {prod.sellerName || 'સ્થાનિક વેચનાર'} 👤
         </div>
+
+        {/* "આ વસ્તુ જોઈએ છે" action button opens product detail screen */}
+        <button
+          id={`btn-card-want-${prod.id}`}
+          onClick={(e) => { e.stopPropagation(); onSelect(); }}
+          style={{
+            width: '100%', marginTop: 10, padding: '8px 12px',
+            background: 'var(--primary-light)', color: 'var(--primary)',
+            border: '1.5px solid rgba(22,163,74,0.25)', borderRadius: 'var(--radius-sm)',
+            fontSize: '0.84rem', fontWeight: 800, cursor: 'pointer',
+            fontFamily: 'var(--font-guj)', transition: 'var(--transition)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6
+          }}
+          onMouseOver={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#ffffff'; }}
+          onMouseOut={e => { e.currentTarget.style.background = 'var(--primary-light)'; e.currentTarget.style.color = 'var(--primary)'; }}
+        >
+          આ વસ્તુ જોઈએ છે
+        </button>
       </div>
     </div>
   );

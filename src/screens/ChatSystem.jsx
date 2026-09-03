@@ -52,6 +52,7 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
     const tempMsg = {
       id: `msg-${Date.now()}`,
       sender: 'user',
+      senderId: currentUser?.id,
       text: text,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
@@ -59,17 +60,26 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
     // Optimistic UI update
     setChats(prevChats => prevChats.map(c => {
       if (c.id === activeChat.id) {
-        return { ...c, lastMessage: text, lastMessageTime: 'હમણાં', messages: [...c.messages, tempMsg] };
+        return {
+          ...c,
+          lastMessage: text,
+          lastMessageTime: 'હમણાં',
+          messages: [...(c.messages || []), tempMsg]
+        };
       }
       return c;
     }));
 
     try {
-      if (currentUser?.id && activeChat.id && !activeChat.id.startsWith('chat-sathsarkaar')) {
+      if (currentUser?.id && activeChat.id) {
+        const receiverId = activeChat.sellerId === currentUser.id
+          ? activeChat.buyerId
+          : (activeChat.sellerId || activeChat.buyerId);
+
         await chatService.sendMessage({
           conversationId: activeChat.id,
           senderId: currentUser.id,
-          receiverId: activeChat.sellerId || activeChat.buyerId || currentUser.id,
+          receiverId: receiverId || currentUser.id,
           text: text
         });
       }
@@ -92,7 +102,7 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
           કોઈ ચેટ નથી
         </h3>
         <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 8, fontFamily: 'var(--font-guj)', maxWidth: 380, margin: '8px auto 0 auto', lineHeight: 1.65 }}>
-          કોઈ પણ વસ્તુ પર "વેચનાર સાથે ચેટ કરો" પર ક્લિક કરો. ચેટ અહીં દેખાશે.
+          કોઈ પણ વસ્તુ પર "વેચનારને મેસેજ કરો" પર ક્લિક કરો. ચેટ અહીં દેખાશે.
         </p>
       </div>
     );
@@ -103,6 +113,8 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
     "શું કિંમતમાં ફેરફાર થઈ શકે?",
     "આ ક્યાંથી ઉઠાવવી?"
   ];
+
+  const participantName = activeChat?.sellerName || activeChat?.otherPersonName || 'ગ્રાહક';
 
   return (
     <div className="chat-container">
@@ -115,6 +127,7 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
         <div className="chat-thread-list">
           {chats.map(chat => {
             const isActive = activeChat && activeChat.id === chat.id;
+            const chatPersonName = chat.sellerName || chat.otherPersonName || 'ગ્રાહક';
             return (
               <div
                 key={chat.id}
@@ -129,12 +142,12 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontWeight: 900, fontSize: '1.05rem', flexShrink: 0
                 }}>
-                  {(chat.sellerName || 'V').charAt(0)}
+                  {chatPersonName.charAt(0)}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                     <strong style={{ fontSize: '0.87rem', color: 'var(--text-primary)', fontFamily: 'var(--font-guj)' }}>
-                      {chat.sellerName}
+                      {chatPersonName}
                     </strong>
                     <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{chat.lastMessageTime}</span>
                   </div>
@@ -175,14 +188,14 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontWeight: 900, fontSize: '1.1rem'
                 }}>
-                  {(activeChat.sellerName || 'V').charAt(0)}
+                  {participantName.charAt(0)}
                 </div>
                 <div>
                   <h4 style={{ fontSize: '0.94rem', fontWeight: 800, fontFamily: 'var(--font-guj)', color: 'var(--text-primary)' }}>
-                    {activeChat.sellerName}
+                    {participantName}
                   </h4>
-                  <div style={{ fontSize: '0.72rem', color: isTyping ? 'var(--primary)' : '#16a34a', fontWeight: 700, fontFamily: 'var(--font-guj)' }}>
-                    {isTyping ? '✍️ ટાઇપ કરે છે...' : '● ઓનલાઇન'}
+                  <div style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: 700, fontFamily: 'var(--font-guj)' }}>
+                    ● ઓનલાઇન
                   </div>
                 </div>
               </div>
@@ -225,23 +238,6 @@ export default function ChatSystem({ chats, setChats, activeChatId, setActiveCha
                 );
               })}
 
-              {/* Typing indicator */}
-              {isTyping && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{
-                    background: '#ffffff', border: '1px solid var(--border-color)',
-                    padding: '10px 16px', borderRadius: 20, borderBottomLeftRadius: 4,
-                    display: 'flex', gap: 4, alignItems: 'center', boxShadow: 'var(--shadow-xs)'
-                  }}>
-                    {[0, 1, 2].map(i => (
-                      <div key={i} style={{
-                        width: 7, height: 7, borderRadius: '50%', background: 'var(--primary)',
-                        animation: `bounce 1.2s ${i * 0.2}s infinite`
-                      }} />
-                    ))}
-                  </div>
-                </div>
-              )}
               <div ref={messagesEndRef} />
             </div>
 
